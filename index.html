@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mesoamerican Mafia - Aztec Ballgame</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0f111a;
+            color: #d4af37;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Georgia', serif;
+            overflow: hidden;
+            background-image: radial-gradient(circle at center, #1a1a24 0%, #050508 100%);
+        }
+
+        #gameContainer {
+            position: relative;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 1), inset 0 0 20px rgba(212, 175, 55, 0.2);
+            border: 8px solid #3e3b32;
+            /* Templo Stone */
+            border-radius: 4px;
+        }
+
+        canvas {
+            display: block;
+            background-color: #8b7355;
+            /* Dirty sand/stone floor */
+            background-image: repeating-linear-gradient(45deg,
+                    rgba(0, 0, 0, 0.05) 25%,
+                    transparent 25%,
+                    transparent 75%,
+                    rgba(0, 0, 0, 0.05) 75%,
+                    rgba(0, 0, 0, 0.05)), repeating-linear-gradient(45deg,
+                    rgba(0, 0, 0, 0.05) 25%,
+                    transparent 25%,
+                    transparent 75%,
+                    rgba(0, 0, 0, 0.05) 75%,
+                    rgba(0, 0, 0, 0.05));
+            background-size: 40px 40px;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            pointer-events: none;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            text-shadow: 2px 2px 4px #000, 0 0 10px rgba(212, 175, 55, 0.5);
+            letter-spacing: 2px;
+        }
+
+        p {
+            margin: 8px 0 0 0;
+            font-size: 0.85rem;
+            color: #a89675;
+            text-shadow: 1px 1px 2px #000;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div id="ui-layer">
+            <h1>Ritual Azteca - Prototipo</h1>
+            <p>Usa WASD o Flechas. Mueve la pesada esfera de caucho.</p>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+
+</html>
