@@ -165,12 +165,65 @@ const pData = {
     vx: 0,
     vz: 0
 };
-// Player 3D Mesh
-const playerGeo = new THREE.CylinderGeometry(pData.radius, pData.radius, 30, 32);
-const playerMat = new THREE.MeshStandardMaterial({ color: 0x8b0000 }); // Blood Red
-const playerMesh = new THREE.Mesh(playerGeo, playerMat);
-playerMesh.position.set(-200, 15, 0);
-playerMesh.castShadow = true;
+
+// --- PROCEDURAL AZTEC WARRIOR BUILDER ---
+function createAztecWarrior(primaryColor, secondaryColor) {
+    const warriorGroup = new THREE.Group();
+
+    // Materials
+    const skinMat = new THREE.MeshStandardMaterial({ color: 0x8d5524, roughness: 0.8 }); // Bronze skin
+    const clothMat = new THREE.MeshStandardMaterial({ color: primaryColor, roughness: 0.9 });
+    const featherMat = new THREE.MeshStandardMaterial({ color: secondaryColor, roughness: 1 });
+    const goldMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.8, roughness: 0.2 });
+
+    // Torso (Bare chest with a belt)
+    const torsoGeo = new THREE.CylinderGeometry(10, 8, 16, 8);
+    const torso = new THREE.Mesh(torsoGeo, skinMat);
+    torso.position.y = 8;
+    torso.castShadow = true;
+    warriorGroup.add(torso);
+
+    // Loincloth / Skirt
+    const skirtGeo = new THREE.ConeGeometry(12, 10, 8);
+    const skirt = new THREE.Mesh(skirtGeo, clothMat);
+    skirt.position.y = -2;
+    skirt.castShadow = true;
+    warriorGroup.add(skirt);
+
+    // Head
+    const headGeo = new THREE.SphereGeometry(7, 16, 16);
+    const head = new THREE.Mesh(headGeo, skinMat);
+    head.position.y = 20;
+    head.castShadow = true;
+    warriorGroup.add(head);
+
+    // Golden Crown/Band
+    const bandGeo = new THREE.CylinderGeometry(7.5, 7.5, 2, 16);
+    const band = new THREE.Mesh(bandGeo, goldMat);
+    band.position.y = 22;
+    warriorGroup.add(band);
+
+    // Feathered Headdress (Penacho)
+    for (let i = 0; i < 5; i++) {
+        const featherGeo = new THREE.ConeGeometry(2, 15, 4);
+        const feather = new THREE.Mesh(featherGeo, featherMat);
+        // Fan out the feathers
+        const angle = (Math.PI / 4) * (i - 2);
+        feather.position.set(Math.sin(angle) * 8, 28, -Math.cos(angle) * 5);
+        feather.rotation.z = -angle * 0.5;
+        feather.rotation.x = -0.2;
+        warriorGroup.add(feather);
+    }
+
+    // Scale the whole group to match our original physics bounds
+    warriorGroup.scale.set(1.2, 1.2, 1.2);
+
+    return warriorGroup;
+}
+
+// 1. Player 3D Mesh (Red & Gold)
+const playerMesh = createAztecWarrior(0x8b0000, 0xd4af37);
+playerMesh.position.set(-200, pData.radius, 0);
 scene.add(playerMesh);
 
 
@@ -181,11 +234,11 @@ const eData = {
     vx: 0,
     vz: 0
 };
-// Enemy 3D Mesh
-const enemyMat = new THREE.MeshStandardMaterial({ color: 0x1a4e66 }); // Deep teal
-const enemyMesh = new THREE.Mesh(playerGeo, enemyMat);
-enemyMesh.position.set(200, 15, 0);
-enemyMesh.castShadow = true;
+// 2. Enemy 3D Mesh (Teal & Silver)
+const enemyMesh = createAztecWarrior(0x1a4e66, 0xc0c0c0);
+enemyMesh.position.set(200, eData.radius, 0);
+// Enemy faces left initially
+enemyMesh.rotation.y = -Math.PI / 2;
 scene.add(enemyMesh);
 
 
@@ -217,10 +270,10 @@ function resetMatch() {
     bData.vx = 0;
     bData.vz = 0;
 
-    playerMesh.position.set(-200, 15, 0);
+    playerMesh.position.set(-200, pData.radius, 0);
     pData.vx = 0; pData.vz = 0;
 
-    enemyMesh.position.set(200, 15, 0);
+    enemyMesh.position.set(200, eData.radius, 0);
     eData.vx = 0; eData.vz = 0;
 }
 
@@ -243,6 +296,11 @@ function updatePhysics() {
 
     playerMesh.position.x += pData.vx;
     playerMesh.position.z += pData.vz;
+
+    // Rotate player to face movement direction
+    if (pData.vx !== 0 || pData.vz !== 0) {
+        playerMesh.rotation.y = -Math.atan2(pData.vz, pData.vx) + Math.PI / 2;
+    }
 
     // Player Boundaries
     const limitX = COURT_WIDTH / 2 - pData.radius;
@@ -278,6 +336,12 @@ function updatePhysics() {
 
     enemyMesh.position.x += eData.vx;
     enemyMesh.position.z += eData.vz;
+
+    // Rotate enemy to face movement direction
+    if (eData.vx !== 0 || eData.vz !== 0) {
+        enemyMesh.rotation.y = -Math.atan2(eData.vz, eData.vx) + Math.PI / 2;
+    }
+
     // Enemy Boundaries
     if (enemyMesh.position.x < -limitX) enemyMesh.position.x = -limitX;
     if (enemyMesh.position.x > limitX) enemyMesh.position.x = limitX;
